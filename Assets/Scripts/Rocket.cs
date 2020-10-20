@@ -3,13 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class Rocket : MonoBehaviour
-{
+public class Rocket : MonoBehaviour{
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float mainThrust = 100f;
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip levelLoad;
     [SerializeField] AudioClip death;
+
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem levelLoadParticles;
+    [SerializeField] ParticleSystem deathParticles;
+
 
     Rigidbody rigidBody;
     AudioSource audioSource;
@@ -28,7 +32,6 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update(){  
         ProcessInput();
-        
     }
 
     private void ProcessInput(){
@@ -44,7 +47,8 @@ public class Rocket : MonoBehaviour
            ApplyThrust();
         }
             else {
-                audioSource.Stop();
+            audioSource.Stop();
+            mainEngineParticles.Stop();
             }
     }
 
@@ -53,7 +57,8 @@ public class Rocket : MonoBehaviour
         rigidBody.AddRelativeForce(Vector3.up * thrustThisFrame);
         if(!audioSource.isPlaying){
             audioSource.PlayOneShot(mainEngine);
-            }
+        }
+        mainEngineParticles.Play();
     }
 
     private void RespondToRotateInput(){
@@ -93,13 +98,14 @@ public class Rocket : MonoBehaviour
         state = State.Transcending;
         audioSource.Stop();
         audioSource.PlayOneShot(levelLoad);
+        levelLoadParticles.Play();
         Invoke ("LoadNextScene", 1f);
-            
     }
     private void StartDeathSequence(){
         state = State.Dying;
         audioSource.Stop();
         audioSource.PlayOneShot(death);
+        deathParticles.Play();
         Invoke("LoadFirstLevel", 1f);
     }
 
